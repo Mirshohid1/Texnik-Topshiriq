@@ -72,6 +72,8 @@ class Comment(models.Model):
         max_length=1000,
         validators=[MinLengthValidator(5)],
     )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created datetime")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated datetime")
 
     def save(self, *args, **kwargs):
         self.content = self.content.strip().capitalize()
