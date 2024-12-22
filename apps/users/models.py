@@ -8,11 +8,12 @@ class User(AbstractUser):
         ('user', 'User'),
     ]
 
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, verbose_name='Email')
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
         default='user',
+        verbose_name='Role',
     )
 
     def __str__(self):
