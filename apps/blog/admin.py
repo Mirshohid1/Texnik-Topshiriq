@@ -1,5 +1,7 @@
+from datetime import timezone
+
 from django.contrib import admin
-from .models import BlogPost
+from .models import BlogPost, Comment
 
 
 class BlogPostAdmin(admin.ModelAdmin):
@@ -31,4 +33,23 @@ class BlogPostAdmin(admin.ModelAdmin):
     unpublish_selected.short_description = "Unpublish selected entries"
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('author', 'post', 'content', 'created_at', 'updated_at')
+    list_filter = ('post', 'author')
+    search_fields = ('content', 'author__username', 'post__title')
+    ordering = ('-created_at',)
+    actions = ['approve_selected', 'delete_selected']
+
+    def delete_selected(self, request, queryset):
+        queryset.delete()
+    delete_selected.short_description = "Delete selected comments"
+
+    def save_model(self, request, obj, form, change):
+        if not obj.id:
+            obj.created_at = timezone.now()
+        obj.updated_at = timezone.now()
+        super().save_model(request, obj, form, change)
+
+
 admin.site.register(BlogPost, BlogPostAdmin)
+admin.site.register(Comment, CommentAdmin)
