@@ -38,5 +38,7 @@ class User(AbstractUser):
         verbose_name='Role',
     )
 
+    objects = CustomUserManager()
+
     def __str__(self):
         return f"User: {self.username} (role: {self.role}) {self.email}"
