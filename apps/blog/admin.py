@@ -1,6 +1,5 @@
-from datetime import timezone
-
 from django.contrib import admin
+from django.utils import timezone
 from .models import BlogPost, Comment
 
 
@@ -12,15 +11,8 @@ class BlogPostAdmin(admin.ModelAdmin):
     list_editable = ('is_published',)
     date_hierarchy = 'created_at'
 
-    fieldsets = (
-        (None, {
-            'fields': ('title', 'content', 'author', 'is_published')
-        }),
-        ('Date Information', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
+    # Просто исключим created_at и updated_at из формы
+    exclude = ('created_at', 'updated_at')  # Эти поля не редактируются
 
     actions = ['publish_selected', 'unpublish_selected']
 
@@ -38,16 +30,12 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('post', 'author')
     search_fields = ('content', 'author__username', 'post__title')
     ordering = ('-created_at',)
-    actions = ['approve_selected', 'delete_selected']
 
-    def delete_selected(self, request, queryset):
-        queryset.delete()
-    delete_selected.short_description = "Delete selected comments"
-
+    # При сохранении, автоматически заполняем created_at и updated_at
     def save_model(self, request, obj, form, change):
-        if not obj.id:
+        if not obj.id:  # Если это новый объект, устанавливаем created_at
             obj.created_at = timezone.now()
-        obj.updated_at = timezone.now()
+        obj.updated_at = timezone.now()  # Обновляем updated_at
         super().save_model(request, obj, form, change)
 
 
