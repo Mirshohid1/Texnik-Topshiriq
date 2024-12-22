@@ -10,6 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+
     class Meta:
         model = BlogPost
         fields = (
