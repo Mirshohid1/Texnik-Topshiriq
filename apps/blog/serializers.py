@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import BlogPost
+from .models import BlogPost, Comment
 from ..users.models import User
 
 
@@ -25,3 +25,12 @@ class BlogPostInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = ('title', 'content', 'is_published')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = (
+            'id', 'post', 'author',
+            'content', 'created_at', 'updated_at',
+        )
