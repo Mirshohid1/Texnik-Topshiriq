@@ -53,3 +53,5 @@ class CommentViewSet(BaseViewSet):
     serializer_class = CommentSerializer
     input_serializer_class = CommentInputSerializer
     is_comment = True
+
+
