@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenBlacklistView
 
 from ..blog.models import BlogPost, Comment
 from ..blog.serializers import (
@@ -12,7 +13,7 @@ from ..blog.serializers import (
     CommentSerializer, CommentInputSerializer,
 )
 from ..users.models import User
-from ..users.serializers import RegisterSerializer, LoginSerializer
+from ..users.serializers import RegisterSerializer, LoginSerializer, CustomTokenObtainPairSerializer
 
 
 class BaseViewSet(ModelViewSet):
@@ -94,3 +95,15 @@ class LoginView(APIView):
                 }
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+class CustomLogoutView(TokenBlacklistView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 205:
+            return Response({'message': "Tizimdan muvaffaqiyatli chiqdingiz"}, status.HTTP_200_OK)
+        return response

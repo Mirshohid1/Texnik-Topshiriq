@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User
 
 
@@ -33,3 +34,15 @@ class LoginSerializer(serializers.ModelSerializer):
         if not user:
             raise serializers.ValidationError({"detail": "Invalid credentials."})
         return user
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, data):
+        user = self.user
+        data['user'] = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'role': user.role
+        }
+        return data
