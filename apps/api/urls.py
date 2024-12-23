@@ -10,6 +10,7 @@ router.register(r'posts', views.BlogPostViewSet)
 router.register(r'comments', views.CommentViewSet)
 
 urlpatterns = [
+    path('profile/<int:id>/', views.ProfileView.as_view(), name='profile'),
     path('auth/register/', views.RegisterView.as_view(), name='register'),
     path('auth/login/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair_login'),
     path('auth/logout/', views.CustomLogoutView.as_view(), name='token_blacklist_logout'),

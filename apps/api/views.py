@@ -2,9 +2,9 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, BasePermission
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenBlacklistView
 
@@ -91,18 +91,18 @@ class CustomLogoutView(TokenBlacklistView):
         return response
 
 
-class ProfileView(RegisterView):
+class ProfileView(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = ProfileSerializer
-    lookup_fields = 'id'
+    lookup_field = 'id'
 
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH']:
-            self.permission_classes = [IsAuthenticated, self.is_profile_owner]
+            self.permission_classes = [IsAuthenticated, IsProfileOwnerOrAdmin]
         else:
             self.permission_classes = [IsAuthenticatedOrReadOnly]
         return super().get_permissions()
 
-    def is_profile_owner(self, request, view):
+    def is_profile_owner_or_admin(self, request, view):
         profile = self.get_object()
-        return profile.user == request.user
+        return profile.user == request.user or self.request.user.role == 'admin'
