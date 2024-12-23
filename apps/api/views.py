@@ -1,10 +1,16 @@
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from ..blog.models import BlogPost, Comment
 from ..blog.serializers import (
     BlogPostSerializer, BlogPostInputSerializer,
     CommentSerializer, CommentInputSerializer,
 )
+from ..users.models import User
+from ..users.serializers import RegisterSerializer, LoginSerializer
 
 
 class BaseViewSet(ModelViewSet):
@@ -44,14 +50,26 @@ class BaseViewSet(ModelViewSet):
 
 class BlogPostViewSet(BaseViewSet):
     queryset = BlogPost.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = BlogPostSerializer
     input_serializer_class = BlogPostInputSerializer
 
 
 class CommentViewSet(BaseViewSet):
     queryset = Comment.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = CommentSerializer
     input_serializer_class = CommentInputSerializer
     is_comment = True
 
 
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                'message': "Foydalanuvchi muvaffaqiyatli ro'yxatdan o'tdi",
+                'user_id': user.id,
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
