@@ -5,7 +5,6 @@
 - If there are any improvements for my code, please let me know 🙏🏻
 
 ### Project description
-- exam
 - The homework for a mentor <a href="https://github.com/abdullaabdukulov">Abdulla Abdukulov (GitHub Profile)</a>
 
 ### Installation and Usage 
