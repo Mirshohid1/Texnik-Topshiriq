@@ -4,17 +4,46 @@ from django.contrib.auth.models import BaseUserManager
 
 
 class CustomUserManager(BaseUserManager):
+    """
+    Custom manager for the User model, providing methods to create
+    superusers and regular users with specific roles.
+
+    Methods:
+        create_superuser(username, email, password, **extra_fields):
+            Creates and returns a superuser with the specified credentials.
+
+        create_user(username, email, password, **extra_fields):
+            Creates and returns a regular user with the specified credentials.
+
+        _create_user(username, email, password, **extra_fields):
+            Helper method to create and save a user with the given credentials.
+       """
+
     def create_superuser(self, username, email=None, password=None, **extra_fields):
+        """
+        Creates and returns a superuser with the 'admin' role and appropriate flags.
+        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'admin')
         return self._create_user(username, email, password, **extra_fields)
 
     def create_user(self, username, email=None, password=None, **extra_fields):
+        """
+        Creates and returns a regular user with the 'user' role.
+        """
+
         extra_fields.setdefault('role', 'user')
         return self._create_user(username, email, password, **extra_fields)
 
     def _create_user(self, username, email, password, **extra_fields):
+        """
+        Helper method to create and save a user with the given credentials.
+        Validates the email and sets the password before saving the user to the database.
+
+        Raises:
+            ValueError: If the email is not provided.
+        """
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
