@@ -49,6 +49,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         return data
 
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
