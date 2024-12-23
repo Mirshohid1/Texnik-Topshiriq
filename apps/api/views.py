@@ -15,38 +15,65 @@ from ..blog.serializers import (
 )
 from ..users.models import User
 from ..users.serializers import RegisterSerializer, ProfileSerializer, CustomTokenObtainPairSerializer
+from ..users.permissions import IsProfileOwnerOrAdmin
 
 
 class BaseViewSet(ModelViewSet):
+    """
+    A base view set that provides common functionality for handling
+    model instances in a DRF viewset. This includes dynamic selection
+    of serializers, permission checks for create, update, and destroy
+    actions, and saving the current user as the author for created instances.
+    """
+
     serializer_class = None
     input_serializer_class = None
     is_comment: bool = False
 
     def get_serializer_class(self):
+        """
+        Returns the appropriate serializer class based on the current action
+        (create, update, partial_update, or other actions).
+        """
         if self.action in ['create', 'update', 'partial_update']:
             return self.input_serializer_class
         return self.serializer_class
 
     def perform_create(self, serializer):
+        """
+        Saves the instance, setting the current user as the author.
+        """
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
+        """
+        Updates the instance after verifying the user's permission to edit it.
+        Raises PermissionDenied if the user lacks permission.
+        """
         comment = self.get_object()
         if not self._my_permission(comment):
             raise PermissionDenied("You don't have permission to edit this object.")
         serializer.save()
 
     def perform_destroy(self, instance):
+        """
+        Deletes the instance after verifying the user's permission to delete it.
+        Raises PermissionDenied if the user lacks permission.
+        """
         if not self._my_permission(instance):
             raise PermissionDenied("You don't have permission to delete this object.")
         super().perform_destroy(instance)
 
     def _my_permission(self, obj):
+        """
+        Checks if the current user has permission to perform the action on the given object.
+        Permissions differ based on whether the object is a comment or not.
+        """
         if self.is_comment:
             return (
-                self.request.user == obj.author or
-                self.request.user.role == 'admin' or
-                self.request.user == obj.post.author
+                    self.request.user == obj.author or
+                    self.request.user.role == 'admin' or
+                    self.request.user == obj.post.author
             )
         else:
             return self.request.user == obj.author or self.request.user.role == 'admin'
