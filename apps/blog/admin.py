@@ -11,8 +11,7 @@ class BlogPostAdmin(admin.ModelAdmin):
     list_editable = ('is_published',)
     date_hierarchy = 'created_at'
 
-    # Просто исключим created_at и updated_at из формы
-    exclude = ('created_at', 'updated_at')  # Эти поля не редактируются
+    exclude = ('created_at', 'updated_at')
 
     actions = ['publish_selected', 'unpublish_selected']
 
@@ -31,11 +30,10 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ('content', 'author__username', 'post__title')
     ordering = ('-created_at',)
 
-    # При сохранении, автоматически заполняем created_at и updated_at
     def save_model(self, request, obj, form, change):
-        if not obj.id:  # Если это новый объект, устанавливаем created_at
+        if not obj.id:
             obj.created_at = timezone.now()
-        obj.updated_at = timezone.now()  # Обновляем updated_at
+        obj.updated_at = timezone.now()
         super().save_model(request, obj, form, change)
 
 
