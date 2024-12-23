@@ -2,6 +2,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -13,7 +14,7 @@ from ..blog.serializers import (
     CommentSerializer, CommentInputSerializer,
 )
 from ..users.models import User
-from ..users.serializers import RegisterSerializer, LoginSerializer, CustomTokenObtainPairSerializer
+from ..users.serializers import RegisterSerializer, ProfileSerializer, CustomTokenObtainPairSerializer
 
 
 class BaseViewSet(ModelViewSet):
@@ -88,3 +89,20 @@ class CustomLogoutView(TokenBlacklistView):
         if response.status_code == 205:
             return Response({'message': "Tizimdan muvaffaqiyatli chiqdingiz"}, status.HTTP_200_OK)
         return response
+
+
+class ProfileView(RegisterView):
+    queryset = User.objects.all()
+    serializer_class = ProfileSerializer
+    lookup_fields = 'id'
+
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            self.permission_classes = [IsAuthenticated, self.is_profile_owner]
+        else:
+            self.permission_classes = [IsAuthenticatedOrReadOnly]
+        return super().get_permissions()
+
+    def is_profile_owner(self, request, view):
+        profile = self.get_object()
+        return profile.user == request.user
