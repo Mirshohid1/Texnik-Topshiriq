@@ -21,20 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-class LoginSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(required=True)
-    password = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('email', 'password')
-
-    def validate(self, data):
-        user = authenticate(email=data['email'], password=data['password'])
-        if not user:
-            raise serializers.ValidationError({"detail": "Invalid credentials."})
-        return user
-
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
