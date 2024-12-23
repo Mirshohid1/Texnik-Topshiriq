@@ -1,4 +1,4 @@
-# Exam 1 (3rd modul)
+# Texnik Topshiriq
 <img src="https://avatars.mds.yandex.net/i?id=fb01ee68b66f297d818d4d02252d179e33a78d9f-11547768-images-thumbs&n=13" width="200">
 
 ### Notes for Mentor
