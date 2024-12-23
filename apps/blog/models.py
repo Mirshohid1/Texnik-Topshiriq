@@ -57,6 +57,17 @@ class BlogPost(models.Model):
 
 
 class Comment(models.Model):
+    """
+    Model representing a comment on a blog post.
+
+    Attributes:
+        post (ForeignKey): The blog post this comment belongs to.
+        author (ForeignKey): The user who authored the comment.
+        content (TextField): The content of the comment.
+        created_at (DateTimeField): The timestamp when the comment was created.
+        updated_at (DateTimeField): The timestamp when the comment was last updated.
+    """
+
     post = models.ForeignKey(
         BlogPost,
         on_delete=models.CASCADE,
@@ -76,6 +87,10 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated datetime")
 
     def save(self, *args, **kwargs):
+        """
+        Prepares and saves the comment, capitalizing the content
+        before saving it to the database.
+        """
         self.content = self.content.strip().capitalize()
         super().save(*args, **kwargs)
 
