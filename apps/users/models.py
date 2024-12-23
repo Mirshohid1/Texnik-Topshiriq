@@ -25,6 +25,15 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    """
+    Custom user model extending AbstractUser to include additional fields
+    for email and role, and to allow user management with a custom manager.
+
+    Attributes:
+        email (EmailField): The user's unique email address.
+        role (CharField): The role of the user (admin or user).
+    """
+
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('user', 'User'),
