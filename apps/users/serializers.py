@@ -37,7 +37,9 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, data):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
         user = self.user
         data['user'] = {
             'id': user.id,
